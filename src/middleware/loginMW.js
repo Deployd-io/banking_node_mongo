@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const joi = require("joi");
@@ -14,10 +15,12 @@ module.exports = (req, res, next) => {
 };
 
 function validateLoginData(body) {
+logger.debug(`>>> Entering validateLoginData(body=${body})`);
   const schema = joi.object({
     email: joi.string().email().required(),
     password: joi.string().min(8).required(),
   });
 
+logger.debug(`<<< Exiting validateLoginData(body=${body})`);
   return schema.validate(body);
 }
