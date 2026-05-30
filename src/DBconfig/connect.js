@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const logger = require("../utils/logger");
 const connectDB = async () => {
+logger.debug('>>> Entering connectDB()');
   try {
     await mongoose.connect(`${process.env.MONGO_URL}`, {
       serverSelectionTimeoutMS: 30000,
@@ -10,6 +11,7 @@ const connectDB = async () => {
     logger.error(err.message);
     logger.error("DB conection closed......");
     process.exit(1);
+	logger.debug('<<< Exiting connectDB()');
   }
 };
 
