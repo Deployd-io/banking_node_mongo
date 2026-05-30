@@ -28,6 +28,7 @@ module.exports = (req, res, next) => {
 };
 
 function validateRegistrationData(body) {
+logger.debug(`>>> Entering validateRegistrationData(body=****)`);
   const schema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
@@ -44,5 +45,6 @@ function validateRegistrationData(body) {
     role: Joi.string().valid("admin", "user").required(),
   });
 
+logger.debug(`<<< Exiting validateRegistrationData(body=****)`);
   return schema.validate(body);
 }
