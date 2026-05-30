@@ -89,7 +89,9 @@ router.post(
 );
 
 router.get("/profilePic", (req, res) => {
+logger.debug(`>>> Entering GET_profilePic(req=****,res=${res})`);
   console.log(__dirname);
+logger.debug(`<<< Exiting GET_profilePic(req=****,res=${res})`);
   const filename = req.query.file;
 
   const filepath = path.join(__dirname, "../../upload", filename);

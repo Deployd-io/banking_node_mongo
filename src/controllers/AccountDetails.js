@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 // @ts-nocheck
 const Account = require("../models/accountModel");
 const _ = require("lodash");
@@ -9,8 +10,10 @@ const _ = require("lodash");
  * @returns {Object|null} - The account details object, or null if the account is not found.
  */
 module.exports.getUserAccountDetails = async (owner_id) => {
+logger.debug(`>>> Entering getUserAccountDetails(owner_id=${owner_id})`);
   let account = await Account.findOne({ owner: owner_id });
   if (!account) return null;
+logger.debug(`getUserAccountDetails(owner_id=${owner_id}): account → ****`);
 
   const Acctdetails = _.pick(account, [
     "accountType",
@@ -19,5 +22,6 @@ module.exports.getUserAccountDetails = async (owner_id) => {
     "accountNumber",
   ]);
 
+logger.debug(`<<< Exiting getUserAccountDetails(owner_id=${owner_id})`);
   return Acctdetails;
 };
