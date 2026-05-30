@@ -32,6 +32,7 @@ router.post(
   "/register",
   validateRegisterationMW,
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering POST_register(req=****,res=${res})`);
     const user = await registerUser(req.body);
 
     if (!user) {
@@ -83,6 +84,7 @@ router.post(
         accountDetails: account,
       });
 
+	logger.debug(`<<< Exiting POST_register(req=****,res=${res})`);
     //send user an email with the new account details
     await sendEmail(
       user.email,
@@ -102,6 +104,7 @@ router.post(
   "/login",
   loginMW,
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering POST_login(req=****,res=${res})`);
     const response = await authController(req.body);
     if (response === "User not found")
       return res.status(404).send("it seems like,you dont have account with us !");
@@ -117,6 +120,7 @@ router.post(
 
     req.user = user;
 
+	logger.debug(`<<< Exiting POST_login(req=****,res=${res})`);
     return;
   }),
   errorMW
@@ -171,6 +175,7 @@ router.post(
 router.post(
   "/verifyOTP",
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering POST_verifyOTP(req=****,res=${res})`);
     const { email, otp } = req.body;
 
     if (!email || !otp) return res.status(400).send("Invalid request");
@@ -191,6 +196,7 @@ router.post(
     user.otpCert = tokenGen({ otp }, process.env.secretKey, "5min");
     await user.save();
     logger.info("finally erased");
+	logger.debug(`<<< Exiting POST_verifyOTP(req=****,res=${res})`);
     return res.status(200).send("OTP verified successfully");
   }),
   errorMW

@@ -18,10 +18,12 @@ router.get(
   "/view-me",
   authorised,
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering GET_view_me(req=****,res=${res})`);
     const user = Jwt.decode(req.header("x-auth-token"));
 
     if (!user) return res.status(500).send("internal server error");
 
+	logger.debug(`<<< Exiting GET_view_me(req=****,res=${res})`);
     return res.status(200).json(user);
   }),
   errorMW
@@ -33,6 +35,7 @@ router.put(
   "/update",
   authorised,
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering PUT_update(req=****,res=${res})`);
     const { payload } = req.body;
 
     if (payload === "picture") {
@@ -60,6 +63,7 @@ router.put(
       user.save();
 
       res.status(200).send("address updated successfully");
+	logger.debug(`<<< Exiting PUT_update(req=****,res=${res})`);
       return;
     }
   }),
@@ -72,6 +76,7 @@ router.post(
   authorised,
   uploadMW,
   tryCatchMW(async (err, req, res) => {
+	logger.debug(`>>> Entering POST_upload(err=${err},req=****,res=${res})`);
     logger.info("file uploaded successfully");
     const filePath = path.join(__dirname, "../../upload", req.file.filename);
     const decodedToken = Jwt.decode(req.header("x-auth-token"));
@@ -84,11 +89,13 @@ router.post(
     );
 
     res.status(200).json({ message: " uploaded successfully", user });
+	logger.debug(`<<< Exiting POST_upload(err=${err},req=****,res=${res})`);
   }),
   errorMW
 );
 
 router.get("/profilePic", (req, res) => {
+logger.debug(`>>> Entering GET_profilePic(req=****,res=${res})`);
   console.log(__dirname);
   const filename = req.query.file;
 
@@ -106,6 +113,7 @@ router.get("/profilePic", (req, res) => {
     }
     // res.status(200).send("file send successfully");
     logger.info("file sent to the user");
+	logger.debug(`<<< Exiting GET_profilePic(req=****,res=${res})`);
     return;
   });
 });

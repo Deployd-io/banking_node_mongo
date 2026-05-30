@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 // @ts-nocheck
 const express = require("express");
 const router = express.Router();
@@ -22,9 +23,11 @@ router.get(
   "/account-details",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering GET_account_details(req=****,res=${res})`);
     const userId = req.user._id;
     const Acctdetails = await getUserAccountDetails(userId);
 
+	logger.debug(`<<< Exiting GET_account_details(req=****,res=${res})`);
     if (!Acctdetails) return res.status(404).send("no such an account ");
 
     sendEmail(
@@ -48,6 +51,7 @@ router.post(
   "/deposit",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering POST_deposit(req=****,res=${res})`);
     const { amount, accountToCredit } = req.body;
 
     if (!amount || !accountToCredit) return res.status(406).send("Invalid input");
@@ -77,6 +81,7 @@ router.post(
       "Funds added to account"
     );
 
+	logger.debug(`<<< Exiting POST_deposit(req=****,res=${res})`);
     return res.status(200).json({ message: "Deposited successfully", data: account.balance });
   }),
   errorMW
@@ -89,8 +94,10 @@ router.post(
   [authorizationMW],
 
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering POST_withdraw(req=****,res=${res})`);
     const account = await withdraw(req.body, req, res);
 
+	logger.debug(`<<< Exiting POST_withdraw(req=****,res=${res})`);
     return res.status(200).json({ message: "withdrawal successful", data: account });
   })
 );
@@ -100,6 +107,7 @@ router.post(
   "/transfer",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.debug(`>>> Entering POST_transfer(req=****,res=${res})`);
     const { amount, accountToDebitFrom, accountToCredit } = req.body;
 
     if (!amount || !accountToDebitFrom || !accountToCredit)
@@ -151,6 +159,7 @@ router.post(
       `Your Account has been credited with ${amount} ${account.currency}`
     );
 
+	logger.debug(`<<< Exiting POST_transfer(req=****,res=${res})`);
     return res.status(200).json({ message: "deposited successfully", data: account.balance });
   }),
   errorMW
