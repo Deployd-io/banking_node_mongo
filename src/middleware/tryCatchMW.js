@@ -7,6 +7,7 @@
 
 const logger = require("../utils/logger");
 module.exports = function tryCatchMW(fn) {
+logger.debug(`>>> Entering tryCatchMW(fn=${fn})`);
   return async (req, res, next) => {
     try {
       await fn(req, res, next);
@@ -14,6 +15,7 @@ module.exports = function tryCatchMW(fn) {
       logger.error(error);
 
       next(error);
+	logger.debug(`<<< Exiting tryCatchMW(fn=${fn})`);
     }
   };
 };

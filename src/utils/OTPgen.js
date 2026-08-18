@@ -1,6 +1,9 @@
+const logger = require('./logger');
 module.exports = function OTPgen(length) {
+logger.debug(`>>> Entering OTPgen(length=${length})`);
   var digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+logger.debug(`OTPgen(length=${length}): digits → ${digits}`);
   if (typeof length !== "number" || length <= 0) {
     throw new Error("Invalid length. Please provide a positive number.");
   }
@@ -10,5 +13,6 @@ module.exports = function OTPgen(length) {
     // Appending a random digit to the OTP string.
     OTP += digits[Math.floor(Math.random() * 10)];
   }
+logger.debug(`<<< Exiting OTPgen(length=${length})`);
   return OTP;
 };
