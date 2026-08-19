@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 const multer = require("multer");
 const path = require("path");
 
@@ -12,6 +13,7 @@ const path = require("path");
  * @param {Function} next - The next middleware function to be called.
  */
 const fileUpload = (req, res, next) => {
+logger.debug(`>>> Entering fileUpload(req=${req},res=${res},next=${next})`);
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       const uploadPath = path.join(__dirname, "../../upload/");
@@ -50,6 +52,7 @@ const fileUpload = (req, res, next) => {
 
     next();
   });
+logger.debug(`<<< Exiting fileUpload(req=${req},res=${res},next=${next})`);
 };
 
 module.exports = fileUpload;
