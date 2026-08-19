@@ -1,3 +1,4 @@
+const logger = require('./logger');
 /**
  * Generates a JSON Web Token (JWT) with the provided payload, secret key, and expiration time.
  *
