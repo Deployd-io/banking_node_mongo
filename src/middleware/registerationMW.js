@@ -10,6 +10,7 @@ const logger = require("../utils/logger");
  * @param {Function} next - The next middleware function.
  */
 module.exports = (req, res, next) => {
+logger.debug('registerationMW', `>>> Entering moduleExport(req=${req},res=${res},next=${next})`);
   logger.info("inside validateRegisterationMW..... ");
   logger.info("attempting to validate user data...");
 
@@ -25,9 +26,11 @@ module.exports = (req, res, next) => {
   logger.info("done validating user data...");
 
   next();
+logger.debug('registerationMW', `<<< Exiting moduleExport(req=${req},res=${res},next=${next})`);
 };
 
 function validateRegistrationData(body) {
+logger.debug('registerationMW', `>>> Entering validateRegistrationData(body=${body})`);
   const schema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
@@ -44,5 +47,6 @@ function validateRegistrationData(body) {
     role: Joi.string().valid("admin", "user").required(),
   });
 
+logger.debug('registerationMW', `<<< Exiting validateRegistrationData(body=${body})`);
   return schema.validate(body);
 }
