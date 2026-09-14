@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 // @ts-nocheck
 const express = require("express");
 const router = express.Router();
@@ -22,10 +23,14 @@ router.get(
   "/account-details",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering GET_account_details(req=${req},res=${res})`);
     const userId = req.user._id;
     const Acctdetails = await getUserAccountDetails(userId);
+	logger.info(`GET_account_details(req=${req},res=${res}): userId → ${userId}`);
+	logger.info(`GET_account_details(req=${req},res=${res}): Acctdetails → ${Acctdetails}`);
 
     if (!Acctdetails) return res.status(404).send("no such an account ");
+	logger.info(`<<< Exiting GET_account_details(req=${req},res=${res})`);
 
     sendEmail(
       req.user.email,
@@ -48,11 +53,15 @@ router.post(
   "/deposit",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering POST_deposit(req=${req},res=${res})`);
     const { amount, accountToCredit } = req.body;
 
     if (!amount || !accountToCredit) return res.status(406).send("Invalid input");
+	const __log_start = Date.now();
 
     const account = await Account.findOne({ accountNumber: accountToCredit }).populate("owner");
+	logger.info(`POST_deposit(req=${req},res=${res}): account → ${account}`);
+	logger.info(`POST_deposit(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`);
     if (!account) return res.status(404).send("No such account in this bank system");
 
     if (!account.isActive) return res.status(406).send("Account is not active");
@@ -77,6 +86,7 @@ router.post(
       "Funds added to account"
     );
 
+	logger.info(`<<< Exiting POST_deposit(req=${req},res=${res})`);
     return res.status(200).json({ message: "Deposited successfully", data: account.balance });
   }),
   errorMW
@@ -89,8 +99,10 @@ router.post(
   [authorizationMW],
 
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering POST_withdraw(req=${req},res=${res})`);
     const account = await withdraw(req.body, req, res);
 
+	logger.info(`POST_withdraw(req=${req},res=${res}): account → ${account}`);
     return res.status(200).json({ message: "withdrawal successful", data: account });
   })
 );
@@ -100,19 +112,24 @@ router.post(
   "/transfer",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering POST_transfer(req=${req},res=${res})`);
     const { amount, accountToDebitFrom, accountToCredit } = req.body;
 
     if (!amount || !accountToDebitFrom || !accountToCredit)
       return res.status(406).send("invalid input");
+	const __log_start = Date.now();
 
     const account = await Account.findOne({ accountNumber: accountToDebitFrom }).populate("owner");
+	logger.info(`POST_transfer(req=${req},res=${res}): account → ${account}`);
     if (!account) return res.status(404).send("no such an account");
 
     const _accountToCredit = await Account.findOne({ accountNumber: accountToCredit }).populate(
       "owner"
     );
+	logger.info(`POST_transfer(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`);
 
     if (!_accountToCredit) return res.status(404).send("no such an account in this bank system");
+	logger.info(`POST_transfer(req=${req},res=${res}): _accountToCredit → ${_accountToCredit}`);
 
     if (account.balance < amount) return res.status(406).send("insufficient funds");
     if (account.currency !== _accountToCredit.currency)
@@ -151,6 +168,7 @@ router.post(
       `Your Account has been credited with ${amount} ${account.currency}`
     );
 
+	logger.info(`<<< Exiting POST_transfer(req=${req},res=${res})`);
     return res.status(200).json({ message: "deposited successfully", data: account.balance });
   }),
   errorMW

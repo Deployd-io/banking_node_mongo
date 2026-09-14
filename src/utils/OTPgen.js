@@ -1,6 +1,9 @@
+const logger = require('./logger');
 module.exports = function OTPgen(length) {
+logger.info(`>>> Entering OTPgen(length=${length})`);
   var digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+logger.info(`OTPgen(length=${length}): digits → ${digits}`);
   if (typeof length !== "number" || length <= 0) {
     throw new Error("Invalid length. Please provide a positive number.");
   }

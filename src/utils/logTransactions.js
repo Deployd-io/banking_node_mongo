@@ -1,3 +1,4 @@
+const logger = require('./logger');
 const Transaction = require("../models/transactionModel");
 module.exports = async function logTransaction(
   sender,
@@ -7,6 +8,7 @@ module.exports = async function logTransaction(
   status,
   description
 ) {
+logger.info(`>>> Entering logTransaction(sender=${sender},recipient=${recipient},amount=${amount},type=${type},status=${status},description=${description})`);
   const transaction = new Transaction({
     senderAccount: sender,
     amount: amount,
@@ -17,4 +19,5 @@ module.exports = async function logTransaction(
     
   });
   await transaction.save();
+logger.info(`logTransaction(sender=${sender},recipient=${recipient},amount=${amount},type=${type},status=${status},description=${description}): transaction → ${transaction}`);
 };
