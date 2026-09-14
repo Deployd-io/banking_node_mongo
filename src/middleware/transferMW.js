@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 const Joi = require("joi");
 const Account = require("../models/accountModel");
 
@@ -12,6 +13,7 @@ const Account = require("../models/accountModel");
  * @returns {Promise<void>} - Resolves when the middleware function completes.
  */
 module.exports = async function transferMW(req, res, next) {
+logger.info(`>>> Entering transferMW(req=${req},res=${res},next=${next})`);
   const { senderAccountNumber, recipientAccountNumber, amount, description } = req.body;
 
   const isValid = Joi.object({
@@ -24,13 +26,18 @@ module.exports = async function transferMW(req, res, next) {
   if (isValid.error) {
     return res.status(400).json({ message: isValid.error.details[0].message });
   }
+const __log_start = Date.now();
+logger.info(`transferMW(req,res,next)=${req},${res},${next}: find operation took ${Date.now() - __log_start} ms`);
   const senderAccount = await Account.findOne({ accountNumber: senderAccountNumber });
   const recipientAccount = await Account.findOne({ accountNumber: recipientAccountNumber });
 
+logger.info(`transferMW(req=${req},res=${res},next=${next}): senderAccount → ${senderAccount}`);
+logger.info(`transferMW(req=${req},res=${res},next=${next}): recipientAccount → ${recipientAccount}`);
   if (!senderAccount) {
     return res.status(400).json({ message: "Invalid sender account number" });
   }
   if (!recipientAccount) {
+	logger.info(`<<< Exiting transferMW(req=${req},res=${res},next=${next})`);
     return res.status(400).json({ message: "Invalid recipient account number" });
   }
   next();
