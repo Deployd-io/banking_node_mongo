@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -7,9 +8,11 @@ const transactionSchema = new Schema(
       type: Number,
       validate: {
         validator: function (value) {
+		logger.info(`>>> Entering validator(value=${value})`, { "event.action": "validator", "logrite.value": value });
           // Require senderAccount only if transactionType is "transfer"
           // @ts-ignore
           if (this.transactionType === "transfer") {
+			logger.info(`<<< Exiting validator(value=${value})`, { "event.action": "validator", "logrite.value": value });
             return value !== undefined && value !== null;
           }
           return true;

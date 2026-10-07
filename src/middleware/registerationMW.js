@@ -10,6 +10,7 @@ const logger = require("../utils/logger");
  * @param {Function} next - The next middleware function.
  */
 module.exports = (req, res, next) => {
+logger.info('registerationMW', `>>> Entering moduleExport(req=${req},res=${res},next=${next})`, { "event.action": "moduleExport", "logrite.req": req, "logrite.res": res, "logrite.next": next });
   logger.info("inside validateRegisterationMW..... ");
   logger.info("attempting to validate user data...");
 
@@ -25,9 +26,11 @@ module.exports = (req, res, next) => {
   logger.info("done validating user data...");
 
   next();
+logger.info('registerationMW', `<<< Exiting moduleExport(req=${req},res=${res},next=${next})`, { "event.action": "moduleExport", "logrite.req": req, "logrite.res": res, "logrite.next": next });
 };
 
 function validateRegistrationData(body) {
+logger.info('registerationMW', `>>> Entering validateRegistrationData(body=${body})`, { "event.action": "validateRegistrationData", "logrite.body": body });
   const schema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
@@ -44,5 +47,6 @@ function validateRegistrationData(body) {
     role: Joi.string().valid("admin", "user").required(),
   });
 
+logger.info('registerationMW', `<<< Exiting validateRegistrationData(body=${body})`, { "event.action": "validateRegistrationData", "logrite.body": body });
   return schema.validate(body);
 }

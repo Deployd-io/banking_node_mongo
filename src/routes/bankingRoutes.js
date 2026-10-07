@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 // @ts-nocheck
 const express = require("express");
 const router = express.Router();
@@ -22,10 +23,14 @@ router.get(
   "/account-details",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering GET_account_details(req=${req},res=${res})`, { "event.action": "GET_account_details", "logrite.req": req, "logrite.res": res });
     const userId = req.user._id;
     const Acctdetails = await getUserAccountDetails(userId);
+	logger.debug(`GET_account_details(req=${req},res=${res}): userId → ${userId}`, { "event.action": "GET_account_details", "logrite.req": req, "logrite.res": res });
+	logger.debug(`GET_account_details(req=${req},res=${res}): Acctdetails → ${Acctdetails}`, { "event.action": "GET_account_details", "logrite.req": req, "logrite.res": res });
 
     if (!Acctdetails) return res.status(404).send("no such an account ");
+	logger.info(`<<< Exiting GET_account_details(req=${req},res=${res})`, { "event.action": "GET_account_details", "logrite.req": req, "logrite.res": res });
 
     sendEmail(
       req.user.email,
@@ -48,12 +53,16 @@ router.post(
   "/deposit",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering POST_deposit(req=${req},res=${res})`, { "event.action": "POST_deposit", "logrite.req": req, "logrite.res": res });
     const { amount, accountToCredit } = req.body;
 
     if (!amount || !accountToCredit) return res.status(406).send("Invalid input");
+	const __log_start = Date.now();
 
     const account = await Account.findOne({ accountNumber: accountToCredit }).populate("owner");
+	logger.debug(`POST_deposit(req=${req},res=${res}): account → ${account}`, { "event.action": "POST_deposit", "logrite.req": req, "logrite.res": res });
     if (!account) return res.status(404).send("No such account in this bank system");
+	logger.debug(`POST_deposit(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "POST_deposit", "event.category": "database", "logrite.req": req, "logrite.res": res });
 
     if (!account.isActive) return res.status(406).send("Account is not active");
 
@@ -77,6 +86,7 @@ router.post(
       "Funds added to account"
     );
 
+	logger.info(`<<< Exiting POST_deposit(req=${req},res=${res})`, { "event.action": "POST_deposit", "logrite.req": req, "logrite.res": res });
     return res.status(200).json({ message: "Deposited successfully", data: account.balance });
   }),
   errorMW
@@ -89,8 +99,10 @@ router.post(
   [authorizationMW],
 
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering POST_withdraw(req=${req},res=${res})`, { "event.action": "POST_withdraw", "logrite.req": req, "logrite.res": res });
     const account = await withdraw(req.body, req, res);
 
+	logger.debug(`POST_withdraw(req=${req},res=${res}): account → ${account}`, { "event.action": "POST_withdraw", "logrite.req": req, "logrite.res": res });
     return res.status(200).json({ message: "withdrawal successful", data: account });
   })
 );
@@ -100,19 +112,24 @@ router.post(
   "/transfer",
   [authorizationMW],
   tryCatchMW(async (req, res) => {
+	logger.info(`>>> Entering POST_transfer(req=${req},res=${res})`, { "event.action": "POST_transfer", "logrite.req": req, "logrite.res": res });
     const { amount, accountToDebitFrom, accountToCredit } = req.body;
 
     if (!amount || !accountToDebitFrom || !accountToCredit)
       return res.status(406).send("invalid input");
+	const __log_start = Date.now();
 
     const account = await Account.findOne({ accountNumber: accountToDebitFrom }).populate("owner");
+	logger.debug(`POST_transfer(req=${req},res=${res}): account → ${account}`, { "event.action": "POST_transfer", "logrite.req": req, "logrite.res": res });
     if (!account) return res.status(404).send("no such an account");
 
     const _accountToCredit = await Account.findOne({ accountNumber: accountToCredit }).populate(
       "owner"
     );
+	logger.debug(`POST_transfer(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "POST_transfer", "event.category": "database", "logrite.req": req, "logrite.res": res });
 
     if (!_accountToCredit) return res.status(404).send("no such an account in this bank system");
+	logger.debug(`POST_transfer(req=${req},res=${res}): _accountToCredit → ${_accountToCredit}`, { "event.action": "POST_transfer", "logrite.req": req, "logrite.res": res });
 
     if (account.balance < amount) return res.status(406).send("insufficient funds");
     if (account.currency !== _accountToCredit.currency)
@@ -151,6 +168,7 @@ router.post(
       `Your Account has been credited with ${amount} ${account.currency}`
     );
 
+	logger.info(`<<< Exiting POST_transfer(req=${req},res=${res})`, { "event.action": "POST_transfer", "logrite.req": req, "logrite.res": res });
     return res.status(200).json({ message: "deposited successfully", data: account.balance });
   }),
   errorMW
