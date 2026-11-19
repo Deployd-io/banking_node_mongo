@@ -12,6 +12,7 @@ const _ = require("lodash");
 module.exports.getUserAccountDetails = async (owner_id) => {
 logger.debug(`>>> Entering getUserAccountDetails(owner_id=${owner_id})`); const __log_start = Date.now();
   let account = await Account.findOne({ owner: owner_id });
+logger.info(`getUserAccountDetails(owner_id)=${owner_id}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "getUserAccountDetails", "event.category": "database", "logrite.owner_id": owner_id });
   if (!account) return null;
 
 logger.debug(`getUserAccountDetails(owner_id=${owner_id}): account → ${account}`, { "event.action": "getUserAccountDetails", "logrite.owner_id": owner_id });
