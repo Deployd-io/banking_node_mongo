@@ -18,6 +18,8 @@ logger.debug(`>>> Entering logTransaction(sender=${sender},recipient=${recipient
     description: description ? description : "",
     
   });
+const __log_start = Date.now();
   await transaction.save();
 logger.debug(`logTransaction(sender=${sender},recipient=${recipient},amount=${amount},type=${type},status=${status},description=${description}): transaction → ${transaction}`, { "event.action": "logTransaction", "logrite.sender": sender, "logrite.recipient": recipient, "logrite.amount": amount, "logrite.type": type, "logrite.status": status, "logrite.description": description });
+logger.info(`logTransaction(sender,recipient,amount,type,status,description)=${sender},${recipient},${amount},${type},${status},${description}: save operation took ${Date.now() - __log_start} ms`, { "event.action": "logTransaction", "event.category": "database", "logrite.sender": sender, "logrite.recipient": recipient, "logrite.amount": amount, "logrite.type": type, "logrite.status": status, "logrite.description": description });
 };

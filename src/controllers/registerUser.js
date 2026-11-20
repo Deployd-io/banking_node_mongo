@@ -27,7 +27,7 @@ const { AccountGen } = require("../utils/AccountGen");
  */
 
 async function registerUser(body, referralCode) {
-logger.debug(`>>> Entering registerUser(body=${body})`, { "event.action": "registerUser" });
+logger.debug(`>>> Entering registerUser(body=${body},referralCode=${referralCode})`, { "event.action": "registerUser", "logrite.referralCode": referralCode });
   const userData = _.pick(body, [
     "name",
     "email",
@@ -50,7 +50,7 @@ logger.debug(`>>> Entering registerUser(body=${body})`, { "event.action": "regis
 logger.debug(`registerUser(body=${body}): user → [name=${user?.name}, gender=${user?.gender}, role=${user?.role}, isActive=${user?.isActive}, isVerified=${user?.isVerified}, deleteAccount=${user?.deleteAccount}, profileImage=${user?.profileImage}, otpExpiration=${user?.otpExpiration}]`, { "event.action": "registerUser" });
   if (!user) return null;
 
-logger.debug(`<<< Exiting registerUser(body=${body})`, { "event.action": "registerUser" });
+logger.debug(`<<< Exiting registerUser(body=${body},referralCode=${referralCode})`, { "event.action": "registerUser", "logrite.referralCode": referralCode });
   return await user.save();
 }
 module.exports = registerUser;
