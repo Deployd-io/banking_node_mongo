@@ -7,6 +7,7 @@ module.exports = async function check_otpValidity ( req, res, next ) {
 logger.debug(`>>> Entering check_otpValidity(req=${req},res=${res},next=${next})`); const __log_start = Date.now();
   try {
     const user = await User.findOne({ email: req.body.email });
+	logger.info(`check_otpValidity(req,res,next)=${req},${res},${next}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "check_otpValidity", "event.category": "database" });
 	logger.debug(`check_otpValidity(req=${req},res=${res},next=${next}): user → ${user}`, { "event.action": "check_otpValidity" });
 
     if (!user) return res.status(400).send("invalid email");

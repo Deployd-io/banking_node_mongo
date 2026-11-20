@@ -102,6 +102,7 @@ router.post(
 	logger.debug(`>>> Entering POST_withdraw(req=${req},res=${res})`, { "event.action": "POST_withdraw" });
     const account = await withdraw(req.body, req, res);
 
+	logger.debug(`<<< Exiting POST_withdraw(req=${req},res=${res})`, { "event.action": "POST_withdraw" });
 	logger.debug(`POST_withdraw(req=${req},res=${res}): account → ${account}`, { "event.action": "POST_withdraw" });
     return res.status(200).json({ message: "withdrawal successful", data: account });
   })

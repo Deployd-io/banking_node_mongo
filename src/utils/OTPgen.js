@@ -13,5 +13,6 @@ logger.debug(`OTPgen(length=${length}): digits → ${digits}`, { "event.action":
     // Appending a random digit to the OTP string.
     OTP += digits[Math.floor(Math.random() * 10)];
   }
+logger.debug(`<<< Exiting OTPgen(length=${length})`, { "event.action": "OTPgen", "logrite.length": length });
   return OTP;
 };
