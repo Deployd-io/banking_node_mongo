@@ -32,6 +32,7 @@ router.post(
   "/register",
   validateRegisterationMW,
   tryCatchMW(async (req, res) => {
+	logger.debug('userRoutes', `>>> Entering POST_register(req=${req},res=${res})`, { "event.action": "POST_register" });
     const user = await registerUser(req.body);
 
     if (!user) {
@@ -83,6 +84,7 @@ router.post(
         accountDetails: account,
       });
 
+	logger.debug('userRoutes', `<<< Exiting POST_register(req=${req},res=${res})`, { "event.action": "POST_register" });
     //send user an email with the new account details
     await sendEmail(
       user.email,
@@ -102,6 +104,7 @@ router.post(
   "/login",
   loginMW,
   tryCatchMW(async (req, res) => {
+	logger.debug('userRoutes', `>>> Entering POST_login(req=${req},res=${res})`, { "event.action": "POST_login" });
     const response = await authController(req.body);
     if (response === "User not found")
       return res.status(404).send("it seems like,you dont have account with us !");
@@ -117,6 +120,7 @@ router.post(
 
     req.user = user;
 
+	logger.debug('userRoutes', `<<< Exiting POST_login(req=${req},res=${res})`, { "event.action": "POST_login" });
     return;
   }),
   errorMW
@@ -126,14 +130,18 @@ router.post(
 router.post(
   "/resetPassword",
   tryCatchMW(async (req, res) => {
+	logger.debug('userRoutes', `>>> Entering POST_resetPassword(req=${req},res=${res})`, { "event.action": "POST_resetPassword" });
     const { email } = req.body;
 
     if (!email) return res.status(400).send("Email is required");
+	const __log_start = Date.now();
 
     const user = await userModel.findOne({ email });
+	logger.info(`POST_resetPassword(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "POST_resetPassword", "event.category": "database" });
 
     if (!user) return res.status(404).send("No account with such email");
 
+	logger.debug(`POST_resetPassword(req=${req},res=${res}): user.otpExpiration → ${user.otpExpiration}`, { "event.action": "POST_resetPassword" });
     const otp = OTPgen(6);
     const otpExpiration = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
 
@@ -161,6 +169,7 @@ router.post(
       return res.status(200).send("OTP sent successfully");
     } catch (err) {
       logger.error("Error sending email:", err.message);
+	logger.debug('userRoutes', `<<< Exiting POST_resetPassword(req=${req},res=${res})`, { "event.action": "POST_resetPassword" });
       return res.status(500).send("Error sending OTP");
     }
   }),
@@ -171,12 +180,16 @@ router.post(
 router.post(
   "/verifyOTP",
   tryCatchMW(async (req, res) => {
+	logger.debug('userRoutes', `>>> Entering POST_verifyOTP(req=${req},res=${res})`, { "event.action": "POST_verifyOTP" });
     const { email, otp } = req.body;
 
     if (!email || !otp) return res.status(400).send("Invalid request");
+	const __log_start = Date.now();
 
     const user = await userModel.findOne({ email });
+	logger.debug(`POST_verifyOTP(req=${req},res=${res}): user.otpExpiration → ${user.otpExpiration}`, { "event.action": "POST_verifyOTP" });
     logger.info("found user to verify-OTP on");
+	logger.info(`POST_verifyOTP(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "POST_verifyOTP", "event.category": "database" });
 
     if (!user) return res.status(400).send("no such a user");
 
@@ -191,6 +204,7 @@ router.post(
     user.otpCert = tokenGen({ otp }, process.env.secretKey, "5min");
     await user.save();
     logger.info("finally erased");
+	logger.debug('userRoutes', `<<< Exiting POST_verifyOTP(req=${req},res=${res})`, { "event.action": "POST_verifyOTP" });
     return res.status(200).send("OTP verified successfully");
   }),
   errorMW
@@ -201,6 +215,7 @@ router.put(
   "/update-password",
   updatePasswordMW,
   tryCatchMW(async (req, res) => {
+	logger.debug('userRoutes', `>>> Entering PUT_update_password(req=${req},res=${res})`, { "event.action": "PUT_update_password" });
     const { email, password } = req.body;
 
     if (!email || !password) return res.status(400).send("Invalid request");
@@ -217,6 +232,8 @@ router.put(
       { password: hashedPassword },
       { new: true }
     );
+	const __log_start = Date.now();
+	logger.info(`PUT_update_password(req,res)=${req},${res}: find operation took ${Date.now() - __log_start} ms`, { "event.action": "PUT_update_password", "event.category": "database" });
 
     if (!user) return res.status(404).send("No user found");
 
@@ -236,6 +253,7 @@ router.put(
       return res.status(200).send("Password changed successfully");
     } catch (err) {
       logger.error("Error sending email:", err.message);
+	logger.debug('userRoutes', `<<< Exiting PUT_update_password(req=${req},res=${res})`, { "event.action": "PUT_update_password" });
       return res.status(500).send("Error notifying user about password change");
     }
   }),
