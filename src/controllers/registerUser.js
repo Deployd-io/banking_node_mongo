@@ -26,7 +26,7 @@ const { AccountGen } = require("../utils/AccountGen");
  * @returns {Promise<User>} - The saved user instance.
  */
 
-async function registerUser(body) {
+async function registerUser(body, referralCode) {
 logger.debug(`>>> Entering registerUser(body=${body})`, { "event.action": "registerUser" });
   const userData = _.pick(body, [
     "name",
@@ -39,6 +39,7 @@ logger.debug(`>>> Entering registerUser(body=${body})`, { "event.action": "regis
     "role",
     "isActive",
   ]);
+  if (referralCode) userData.referredBy = String(referralCode).trim();
 
   // Hash the password
   const salt = await bcrypt.genSalt(10);

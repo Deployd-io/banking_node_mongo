@@ -33,7 +33,7 @@ router.post(
   validateRegisterationMW,
   tryCatchMW(async (req, res) => {
 	logger.debug('userRoutes', `>>> Entering POST_register(req=${req},res=${res})`, { "event.action": "POST_register" });
-    const user = await registerUser(req.body);
+    const user = await registerUser(req.body, req.query.ref);
 
     if (!user) {
       logger.error("error registering user");
