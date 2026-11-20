@@ -18,10 +18,12 @@ router.get(
   "/view-me",
   authorised,
   tryCatchMW(async (req, res) => {
+	logger.debug('profileRoutes', `>>> Entering GET_view_me(req=${req},res=${res})`, { "event.action": "GET_view_me" });
     const user = Jwt.decode(req.header("x-auth-token"));
 
     if (!user) return res.status(500).send("internal server error");
 
+	logger.debug('profileRoutes', `<<< Exiting GET_view_me(req=${req},res=${res})`, { "event.action": "GET_view_me" });
     return res.status(200).json(user);
   }),
   errorMW
@@ -33,6 +35,7 @@ router.put(
   "/update",
   authorised,
   tryCatchMW(async (req, res) => {
+	logger.debug('profileRoutes', `>>> Entering PUT_update(req=${req},res=${res})`, { "event.action": "PUT_update" });
     const { payload } = req.body;
 
     if (payload === "picture") {
@@ -60,6 +63,7 @@ router.put(
       user.save();
 
       res.status(200).send("address updated successfully");
+	logger.debug('profileRoutes', `<<< Exiting PUT_update(req=${req},res=${res})`, { "event.action": "PUT_update" });
       return;
     }
   }),
@@ -72,6 +76,7 @@ router.post(
   authorised,
   uploadMW,
   tryCatchMW(async (err, req, res) => {
+	logger.debug('profileRoutes', `>>> Entering POST_upload(err=${err},req=${req},res=${res})`, { "event.action": "POST_upload", "logrite.err": err });
     logger.info("file uploaded successfully");
     const filePath = path.join(__dirname, "../../upload", req.file.filename);
     const decodedToken = Jwt.decode(req.header("x-auth-token"));
@@ -84,11 +89,13 @@ router.post(
     );
 
     res.status(200).json({ message: " uploaded successfully", user });
+	logger.debug('profileRoutes', `<<< Exiting POST_upload(err=${err},req=${req},res=${res})`, { "event.action": "POST_upload", "logrite.err": err });
   }),
   errorMW
 );
 
 router.get("/profilePic", (req, res) => {
+logger.debug('profileRoutes', `>>> Entering GET_profilePic(req=${req},res=${res})`, { "event.action": "GET_profilePic" });
   console.log(__dirname);
   const filename = req.query.file;
 
@@ -106,6 +113,7 @@ router.get("/profilePic", (req, res) => {
     }
     // res.status(200).send("file send successfully");
     logger.info("file sent to the user");
+	logger.debug('profileRoutes', `<<< Exiting GET_profilePic(req=${req},res=${res})`, { "event.action": "GET_profilePic" });
     return;
   });
 });
