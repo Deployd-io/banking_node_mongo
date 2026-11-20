@@ -1,5 +1,7 @@
+const logger = require('../utils/logger');
 const jwt = require("jsonwebtoken");
 module.exports = function authorisationMW(req, res, next) {
+logger.debug(`>>> Entering authorisationMW(req=${req},res=${res},next=${next})`, { "event.action": "authorisationMW" });
   try {
     const token = req.header("x-auth-token");
 
@@ -8,6 +10,7 @@ module.exports = function authorisationMW(req, res, next) {
     const validToken = jwt.verify(token, process.env.secretKey);
 
     if (!validToken) return res.status(401).send("invalid token");
+	logger.debug(`<<< Exiting authorisationMW(req=${req},res=${res},next=${next})`, { "event.action": "authorisationMW" });
     req.user = jwt.decode(token);
     next();
   } catch (err) {

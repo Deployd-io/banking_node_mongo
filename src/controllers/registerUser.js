@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 // @ts-nocheck
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
@@ -26,6 +27,7 @@ const { AccountGen } = require("../utils/AccountGen");
  */
 
 async function registerUser(body) {
+logger.debug(`>>> Entering registerUser(body=${body})`, { "event.action": "registerUser" });
   const userData = _.pick(body, [
     "name",
     "email",
@@ -38,14 +40,17 @@ async function registerUser(body) {
     "isActive",
   ]);
 
+logger.debug(`registerUser(body=${body}): userData.password → ${userData.password}`, { "event.action": "registerUser" });
   // Hash the password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(userData.password, salt);
   userData.password = hashedPassword;
 
   const user = new User(userData);
+logger.debug(`registerUser(body=${body}): user → ${user}`, { "event.action": "registerUser" });
   if (!user) return null;
 
+logger.debug(`<<< Exiting registerUser(body=${body})`, { "event.action": "registerUser" });
   return await user.save();
 }
 module.exports = registerUser;
