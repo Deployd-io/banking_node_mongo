@@ -40,6 +40,7 @@ logger.debug(`>>> Entering registerUser(body=${body})`, { "event.action": "regis
     "isActive",
   ]);
   if (referralCode) userData.referredBy = String(referralCode).trim();
+logger.debug(`registerUser(body=${body},referralCode=${referralCode}): userData.password → ${userData.password}`, { "event.action": "registerUser", "logrite.referralCode": referralCode });
 
 logger.debug(`registerUser(body=${body}): userData.password → ${userData.password}`, { "event.action": "registerUser" });
   // Hash the password
